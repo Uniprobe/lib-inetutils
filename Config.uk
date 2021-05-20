@@ -1,0 +1,10 @@
+menuconfig LIBINETUTILS
+	bool "inetutils Unikraft library"
+	default n
+
+if LIBINETUTILS
+config LIBINETUTILS_MAIN_FUNCTION
+  bool "Provide main function"
+  default n
+
+endif
