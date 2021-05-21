@@ -7,4 +7,35 @@ config LIBINETUTILS_MAIN_FUNCTION
   bool "Provide main function"
   default n
 
+menuconfig LIBINETUTILS_PING
+	bool "Provide ping functionality"
+	default n
+
+if LIBINETUTILS_PING
+config LIBINETUTILS_PING_MAIN_FUNCTION
+	bool "Provide ping main function"
+	default n
+endif
+
+menuconfig LIBINETUTILS_TRACEROUTE
+	bool "Provide traceroute functionality"
+	default n
+
+if LIBINETUTILS_TRACEROUTE
+config LIBINETUTILS_TRACEROUTE_MAIN_FUNCTION
+	bool "Provide traceroute main function"
+	default n
+endif
+
+
+menuconfig LIBINETUTILS_FTP
+	bool "Provide ftp functionality"
+	default n
+
+if LIBINETUTILS_FTP
+config LIBINETUTILS_FTP_MAIN_FUNCTION
+	default "Provide ftp main function"
+	default n
+endif
+
 endif

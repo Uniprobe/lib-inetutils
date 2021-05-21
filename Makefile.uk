@@ -49,7 +49,7 @@ $(eval $(call fetch,libinetutils,$(LIBINETUTILS_URL)))
 ################################################################################
 # Helpers
 ################################################################################
-LIBINETUTILS_SRC = $(LIBINETUTILS_ORIGIN)/$(LIBINETUTILS_SUBDIR)/src
+LIBINETUTILS_SRC = $(LIBINETUTILS_ORIGIN)/$(LIBINETUTILS_SUBDIR)
 
 ################################################################################
 # Library includes
@@ -59,10 +59,10 @@ CINCLUDES-y += -I$(LIBINETUTILS_BASE)/include
 ################################################################################
 # Flags
 ################################################################################
-LIBINETUTILS_FLAGS = -DDEBUG
+LIBINETUTILS_FLAGS = -DDEBUG -D_LIBC
 
 # Suppress some warnings to make the build process look neater
-LIBINETUTILS_FLAGS_SUPPRESS = -Wsign-compare
+LIBINETUTILS_FLAGS_SUPPRESS += -Wunused-parameter
 
 LIBINETUTILS_CFLAGS-y += $(LIBINETUTILS_FLAGS)
 LIBINETUTILS_CFLAGS-y += $(LIBINETUTILS_FLAGS_SUPPRESS)
@@ -78,4 +78,43 @@ LIBINETUTILSSRCS-$(CONFIG_LIBINETUTILS_MAIN_FUNCTION) += $(LIBINETUTILS_BASE)/ma
 ################################################################################
 # Library sources
 ################################################################################
-LIBINETUTILS_SRCS-y += $(LIBINETUTILS_SRC)/fping.c
+
+################################################################################
+# Inetutils code -- libicmp
+################################################################################
+LIBINETUTILS_SRCS-y += $(LIBINETUTILS_SRC)/libicmp/icmp_address.c
+LIBINETUTILS_SRCS-y += $(LIBINETUTILS_SRC)/libicmp/icmp_cksum.c
+LIBINETUTILS_SRCS-y += $(LIBINETUTILS_SRC)/libicmp/icmp_echo.c
+LIBINETUTILS_SRCS-y += $(LIBINETUTILS_SRC)/libicmp/icmp_timestamp.c
+
+################################################################################
+# Inetutils code -- ping
+################################################################################
+ifeq ($(CONFIG_LIBINETUTILS_PING),y)
+LIBINETUTILS_SRCS-y += $(LIBINETUTILS_SRC)/ping/ping_address.c
+LIBINETUTILS_SRCS-y += $(LIBINETUTILS_SRC)/ping/ping_common.c
+LIBINETUTILS_SRCS-y += $(LIBINETUTILS_SRC)/ping/ping_echo.c
+LIBINETUTILS_SRCS-y += $(LIBINETUTILS_SRC)/ping/ping_router.c
+LIBINETUTILS_SRCS-y += $(LIBINETUTILS_SRC)/ping/ping_timestamp.c
+LIBINETUTILS_SRCS-y += $(LIBINETUTILS_SRC)/ping/libping.c
+LIBINETUTILS_SRCS-y += $(LIBINETUTILS_SRC)/ping/ping.c
+endif
+
+################################################################################
+# Inetutils code -- traceroute
+################################################################################
+ifeq ($(CONFIG_LIBINETUTILS_TRACEROUTE),y)
+LIBINETUTILS_SRCS-y += $(LIBINETUTILS_SRC)/src/traceroute.c
+endif
+
+################################################################################
+# Inetutils code -- ftp
+################################################################################
+ifeq ($(CONFIG_LIBINETUTILS_FTP),y)
+LIBINETUTILS_SRCS-y += $(LIBINETUTILS_SRC)/ftp/cmds.c
+LIBINETUTILS_SRCS-y += $(LIBINETUTILS_SRC)/ftp/cmdtab.c
+LIBINETUTILS_SRCS-y += $(LIBINETUTILS_SRC)/ftp/domacro.c
+LIBINETUTILS_SRCS-y += $(LIBINETUTILS_SRC)/ftp/ftp.c
+LIBINETUTILS_SRCS-y += $(LIBINETUTILS_SRC)/ftp/ruserpass.c
+LIBINETUTILS_SRCS-y += $(LIBINETUTILS_SRC)/ftp/main.c
+endif
