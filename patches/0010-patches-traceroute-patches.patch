@@ -1,0 +1,399 @@
+From e5d8d9343cdc9f2f62cb90a7e9d3de22ba9cc9e0 Mon Sep 17 00:00:00 2001
+From: Ethan Cotterell <ethancotterell@gmail.com>
+Date: Fri, 21 May 2021 12:15:42 +0100
+Subject: [PATCH] patches: traceroute patches
+
+---
+ src/traceroute.c | 165 +++++++++++++++++++++++++++++------------------
+ 1 file changed, 103 insertions(+), 62 deletions(-)
+
+diff --git a/src/traceroute.c b/src/traceroute.c
+index de7db4b5..e5f3d428 100644
+--- a/src/traceroute.c
++++ b/src/traceroute.c
+@@ -28,7 +28,7 @@
+ 
+ #include <netinet/in_systm.h>
+ #include <netinet/in.h>
+-#include <netinet/ip.h>
++#include <lwip/ip.h>
+ /* #include <netinet/ip_icmp.h> -- Deliberately not including this
+    since the definitions in use are being pulled in by libicmp. */
+ #ifdef HAVE_NETINET_IP_VAR_H
+@@ -44,12 +44,9 @@
+ #include <stdio.h>
+ #include <ctype.h>
+ #include <errno.h>
+-#include <error.h>
+-#include <progname.h>
+ #include <limits.h>
+ #include <assert.h>
+ #include <argp.h>
+-#include <unused-parameter.h>
+ #include <icmp.h>
+ #ifdef HAVE_LOCALE_H
+ # include <locale.h>
+@@ -60,8 +57,7 @@
+ # include <idna.h>
+ #endif
+ 
+-#include "xalloc.h"
+-#include "libinetutils.h"
++#include <libinetutils.h>
+ 
+ #define TRACE_UDP_PORT 33434
+ #define TRACE_TTL 1
+@@ -176,8 +172,10 @@ parse_opt (int key, char *arg, struct argp_state *state)
+     {
+     case 'f':
+       opt_ttl = strtol (arg, &p, 0);
+-      if (*p || opt_ttl <= 0 || opt_ttl > 255)
+-        error (EXIT_FAILURE, 0, "impossible distance `%s'", arg);
++      if (*p || opt_ttl <= 0 || opt_ttl > 255) {
++        fprintf(stderr, "impossible distance '%s'\n", arg);
++        exit(1);
++      }
+       break;
+ 
+ #ifdef IP_OPTIONS
+@@ -207,28 +205,36 @@ parse_opt (int key, char *arg, struct argp_state *state)
+ 
+     case 'm':
+       opt_max_hops = strtol (arg, &p, 0);
+-      if (*p || opt_max_hops <= 0 || opt_max_hops > 255)
+-	error (EXIT_FAILURE, 0, "invalid hops value `%s'", arg);
++      if (*p || opt_max_hops <= 0 || opt_max_hops > 255) {
++        fprintf(stderr, "invalid hops value %s\n", arg);
++        exit(1);
++      }
+       break;
+ 
+     case 'p':
+       opt_port = strtol (arg, &p, 0);
+-      if (*p || opt_port <= 0 || opt_port > 65536)
+-        error (EXIT_FAILURE, 0, "invalid port number `%s'", arg);
++      if (*p || opt_port <= 0 || opt_port > 65536) {
++        fprintf(stderr, "invalid port number '%s'\n", arg);
++        exit(1);
++      }
+       break;
+ 
+     case 'q':
+       opt_max_tries = (int) strtol (arg, &p, 10);
+       if (*p)
+         argp_error (state, "invalid value (`%s' near `%s')", arg, p);
+-      if (opt_max_tries < 1 || opt_max_tries > 10)
+-        error (EXIT_FAILURE, 0, "number of tries should be between 1 and 10");
++      if (opt_max_tries < 1 || opt_max_tries > 10) {
++        fprintf(stderr, "number of tries should be between 1 and 10\n");
++        exit(1);
++      }
+       break;
+ 
+     case 't':
+       opt_tos = strtol (arg, &p, 0);
+-      if (*p || opt_tos < 0 || opt_tos > 255)
+-	error (EXIT_FAILURE, 0, "invalid TOS value `%s'", arg);
++      if (*p || opt_tos < 0 || opt_tos > 255) {
++        fprintf(stderr, "invalid TOS value '%s'\n", arg);
++        exit(1);
++      }
+       break;
+ 
+     case 'M':
+@@ -242,8 +248,10 @@ parse_opt (int key, char *arg, struct argp_state *state)
+ 
+     case 'w':
+       opt_wait = strtol (arg, &p, 0);
+-      if (*p || opt_wait < 0 || opt_wait > 60)
+-	error (EXIT_FAILURE, 0, "ridiculous waiting time `%s'", arg);
++      if (*p || opt_wait < 0 || opt_wait > 60) {
++        fprintf(stderr, "ridiculous waiting time '%s'\n", arg);
++        exit(1);
++      }
+       break;
+ 
+     case OPT_RESOLVE:
+@@ -252,7 +260,7 @@ parse_opt (int key, char *arg, struct argp_state *state)
+ 
+     case ARGP_KEY_ARG:
+       host_is_given = true;
+-      hostname = xstrdup(arg);
++      hostname = strdup(arg);
+       break;
+ 
+     case ARGP_KEY_SUCCESS:
+@@ -278,7 +286,7 @@ main (int argc, char **argv)
+   struct addrinfo hints, *res;
+   trace_t trace;
+ 
+-  set_program_name (argv[0]);
++  // set_program_name (argv[0]);
+ 
+ #ifdef HAVE_SETLOCALE
+   setlocale (LC_ALL, "");
+@@ -290,8 +298,10 @@ main (int argc, char **argv)
+   iu_argp_init ("traceroute", program_authors);
+   argp_parse (&argp, argc, argv, 0, NULL, NULL);
+ 
+-  if ((hostname == NULL) || (*hostname == '\0'))
+-    error (EXIT_FAILURE, 0, "unknown host");
++  if ((hostname == NULL) || (*hostname == '\0')) {
++    fprintf(stderr, "unknown host '%s'\n", hostname);
++    exit(1);
++  }
+ 
+   /* Hostname lookup first for better information */
+   memset (&hints, 0, sizeof (hints));
+@@ -308,16 +318,20 @@ main (int argc, char **argv)
+   rc = idna_to_ascii_lz (hostname, &rhost, 0);
+   free (hostname);
+ 
+-  if (rc)
+-    error (EXIT_FAILURE, 0, "unknown host");
++  if (rc) {
++    fprintf(stderr, "unknown host '%s'\n", hostname);
++    exit(1);
++  }
+ #else /* !HAVE_IDN && !HAVE_IDN2 */
+   rhost = hostname;
+ #endif
+ 
+   rc = getaddrinfo (rhost, NULL, &hints, &res);
+ 
+-  if (rc)
+-    error (EXIT_FAILURE, 0, "unknown host");
++  if (rc) {
++    fprintf(stderr, "unknown host\n");
++    exit(1);
++  }
+ 
+   memcpy (&dest, res->ai_addr, res->ai_addrlen);
+   dest.sin_port = htons (opt_port);
+@@ -354,7 +368,7 @@ main (int argc, char **argv)
+ 
+ void
+ do_try (trace_t * trace, const int hop,
+-	const int max_hops _GL_UNUSED_PARAMETER,
++	const int max_hops,
+ 	const int max_tries)
+ {
+   fd_set readset;
+@@ -402,7 +416,8 @@ do_try (trace_t * trace, const int hop,
+ 	      /* was interrupted */
+ 	      break;
+ 	    default:
+-	      error (EXIT_FAILURE, errno, "select failed");
++        fprintf(stderr, "select failed\n");
++        exit(1);
+ 	      break;
+ 	    }
+ 	}
+@@ -484,12 +499,16 @@ trace_init (trace_t * t, const struct sockaddr_in to,
+   if (t->type == TRACE_UDP)
+     {
+       t->udpfd = socket (PF_INET, SOCK_DGRAM, 0);
+-      if (t->udpfd < 0)
+-        error (EXIT_FAILURE, errno, "socket");
++      if (t->udpfd < 0) {
++        fprintf(stderr, "socket(PF_INET, SOCK_DGRAM, 0)\n");
++        exit(1);
++      }
+ 
+       if (setsockopt (t->udpfd, IPPROTO_IP, IP_TTL, ttlp,
+-		      sizeof (*ttlp)) < 0)
+-        error (EXIT_FAILURE, errno, "setsockopt");
++		      sizeof (*ttlp)) < 0) {
++            fprintf(stderr, "setsockopt(IP_TTL)\n");
++            exit(1);
++          }
+     }
+ 
+   if (t->type == TRACE_ICMP || t->type == TRACE_UDP)
+@@ -513,17 +532,22 @@ trace_init (trace_t * t, const struct sockaddr_in to,
+ 		errno = EPERM;
+ 	    }
+ 
+-	  if (t->icmpfd < 0)
+-	    error (EXIT_FAILURE, errno, "socket");
++	  if (t->icmpfd < 0) {
++      fprintf(stderr, "socket error\n");
++      exit(1);
++    }
+ 
+ 	  if (setsockopt (t->icmpfd, IPPROTO_IP, IP_TTL,
+-			  ttlp, sizeof (*ttlp)) < 0)
+-	    error (EXIT_FAILURE, errno, "setsockopt");
++			  ttlp, sizeof (*ttlp)) < 0) {
++          fprintf(stderr, "setsockopt(IP_TTL)\n");
++          exit(1);
++        }
+ 	}
+       else
+ 	{
+ 	  /* FIXME: Should we error out? */
+-	  error (EXIT_FAILURE, 0, "can't find supplied protocol 'icmp'");
++    fprintf(stderr, "can't find supplied protocol 'icmp'\n");
++    exit(1);
+ 	}
+ 
+       /* free (protocol); ??? */
+@@ -538,14 +562,18 @@ trace_init (trace_t * t, const struct sockaddr_in to,
+ 
+   if (opt_tos >= 0)
+     if (setsockopt (fd, IPPROTO_IP, IP_TOS,
+-		    &opt_tos, sizeof (opt_tos)) < 0)
+-      error (0, errno, "setsockopt(IP_TOS)");
++		    &opt_tos, sizeof (opt_tos)) < 0) {
++          fprintf(stderr, "setsockopt(IP_TOS)\n");
++          exit(1);
++        }
+ 
+ #ifdef IP_OPTIONS
+   if (len_ip_opts)
+     if (setsockopt (fd, IPPROTO_IP, IP_OPTIONS,
+-		    &ip_opts, len_ip_opts) < 0)
+-      error (0, errno, "setsockopt(IPOPT_LSRR)");
++		    &ip_opts, len_ip_opts) < 0) {
++          fprintf(stderr, "setsockopt(IPOPT_LSRR)\n");
++          exit(1);
++        }
+ #endif /* IP_OPTIONS */
+ }
+ 
+@@ -573,7 +601,7 @@ trace_read (trace_t * t, int * type, int * code)
+ {
+   int len, rc = 0;
+   unsigned char data[CAPTURE_LEN];
+-  struct ip *ip;
++  struct ip_hdr *ip;
+   icmphdr_t *ic;
+   socklen_t siz;
+ 
+@@ -583,8 +611,10 @@ trace_read (trace_t * t, int * type, int * code)
+ 
+   len = recvfrom (t->icmpfd, (char *) data, sizeof (data), 0,
+ 		  (struct sockaddr *) &t->from, &siz);
+-  if (len < 0)
+-    error (EXIT_FAILURE, errno, "recvfrom");
++  if (len < 0) {
++    fprintf(stderr, "recvfrom error\n");
++    exit(1);
++  }
+ 
+   icmp_generic_decode (data, sizeof (data), &ip, &ic);
+ 
+@@ -603,7 +633,7 @@ trace_read (trace_t * t, int * type, int * code)
+ 
+ 	/* check whether it's for us */
+         port = (unsigned short *) ((void *) &ic->icmp_ip +
+-			(ic->icmp_ip.ip_hl << 2) + sizeof (in_port_t));
++			((ic->icmp_ip._v_hl & 0x0f) << 2) + sizeof (in_port_t));
+ 	if (*port != t->to.sin_port)	/* Network byte order!  */
+ 	  return -1;
+ 
+@@ -635,11 +665,11 @@ trace_read (trace_t * t, int * type, int * code)
+ 	  || ic->icmp_type == ICMP_DEST_UNREACH)
+ 	{
+ 	  unsigned short seq, ident;
+-	  struct ip *old_ip;
++	  struct ip_hdr *old_ip;
+ 	  icmphdr_t *old_icmp;
+ 
+-	  old_ip = (struct ip *) &ic->icmp_ip;
+-	  old_icmp = (icmphdr_t *) ((void *) old_ip + (old_ip->ip_hl <<2));
++	  old_ip = (struct ip_hdr *) &ic->icmp_ip;
++	  old_icmp = (icmphdr_t *) ((void *) old_ip + (IPH_HL(old_ip)));
+ 	  seq = ntohs (old_icmp->icmp_seq);
+ 	  ident = ntohs (old_icmp->icmp_id);
+ 
+@@ -652,7 +682,7 @@ trace_read (trace_t * t, int * type, int * code)
+ 	    return -1;
+ 	}
+ 
+-      if (ip->ip_src.s_addr == dest.sin_addr.s_addr
++      if (ip->src.addr == dest.sin_addr.s_addr
+ 	  || ic->icmp_type == ICMP_DEST_UNREACH)
+ 	/* FIXME: Ugly hack. */
+ 	stop = 1;
+@@ -692,12 +722,15 @@ trace_write (trace_t * t)
+ 	      case ECONNRESET:
+ 		break;
+ 	      default:
+-		error (EXIT_FAILURE, errno, "sendto");
++          fprintf(stderr, "sendto\n");
++          exit(1);
+ 	      }
+ 	  }
+ 
+-	if (gettimeofday (&t->tsent, NULL) < 0)
+-	  error (EXIT_FAILURE, errno, "gettimeofday");
++	if (gettimeofday (&t->tsent, NULL) < 0) {
++    fprintf(stderr, "gettimeofday\n");
++    exit(1);
++  }
+       }
+       break;
+ 
+@@ -730,12 +763,15 @@ trace_write (trace_t * t)
+ 	      case ECONNRESET:
+ 		break;
+ 	      default:
+-		error (EXIT_FAILURE, errno, "sendto");
++          fprintf(stderr, "sendto\n");
++          exit(1);
+ 	      }
+ 	  }
+ 
+-	if (gettimeofday (&t->tsent, NULL) < 0)
+-	  error (EXIT_FAILURE, errno, "gettimeofday");
++	if (gettimeofday (&t->tsent, NULL) < 0) {
++    fprintf(stderr, "gettimeofday\n");
++    exit(1);
++  }
+       }
+       break;
+ 
+@@ -771,8 +807,10 @@ trace_inc_ttl (trace_t * t)
+   ttlp = &t->ttl;
+   t->ttl++;
+   fd = (t->type == TRACE_UDP ? t->udpfd : t->icmpfd);
+-  if (setsockopt (fd, IPPROTO_IP, IP_TTL, ttlp, sizeof (*ttlp)) < 0)
+-    error (EXIT_FAILURE, errno, "setsockopt");
++  if (setsockopt (fd, IPPROTO_IP, IP_TTL, ttlp, sizeof (*ttlp)) < 0) {
++    fprintf(stderr, "setsockopt(IP_TTL)\n");
++    exit(1);
++  }
+ }
+ 
+ void
+@@ -826,9 +864,10 @@ trace_ip_opts (struct sockaddr_in *to)
+ 	    *p++ = '\0';
+ 
+ 	  rc = getaddrinfo (gateway, NULL, &hints, &res);
+-	  if (rc)
+-	    error (EXIT_FAILURE, errno, "gateway `%s' %s",
+-		   gateway, gai_strerror(rc));
++	  if (rc) {
++      fprintf(stderr, "gateway '%s' %s\n", gateway, gai_strerror(rc));
++      exit(1);
++    }
+ 
+ 	  /* Put target into next unused slot.  */
+ 	  memcpy (optbase + optbase[IPOPT_OLEN],
+@@ -843,8 +882,10 @@ trace_ip_opts (struct sockaddr_in *to)
+ 	  gateway = p;
+ 	}
+ 
+-      if (gateway && *gateway)
+-	error (EXIT_FAILURE, 0, "too many gateways specified");
++      if (gateway && *gateway) {
++        fprintf(stderr, "too many gateways specified\n");
++        exit(1);
++      }
+ 
+       /* Append the final destination.  */
+       memcpy (optbase + optbase[IPOPT_OLEN],
+-- 
+2.25.1
+

@@ -1,0 +1,483 @@
+From 557fbd3c454527ae68b42a1d4d3e90c1e56d59cd Mon Sep 17 00:00:00 2001
+From: Ethan Cotterell <ethancotterell@gmail.com>
+Date: Fri, 21 May 2021 15:01:26 +0100
+Subject: [PATCH] patches: ftp patches
+
+---
+ ftp/ftp.c | 122 ++++++++++++++++++++++++++++--------------------------
+ 1 file changed, 64 insertions(+), 58 deletions(-)
+
+diff --git a/ftp/ftp.c b/ftp/ftp.c
+index 96fb6a59..1855f4de 100644
+--- a/ftp/ftp.c
++++ b/ftp/ftp.c
+@@ -63,14 +63,13 @@
+ # include <netinet/in_systm.h>
+ #endif
+ #ifdef HAVE_NETINET_IP_H
+-# include <netinet/ip.h>
++# include <lwip/ip.h>
+ #endif
+ #include <arpa/inet.h>
+ #include <arpa/ftp.h>
+ #include <arpa/telnet.h>
+ 
+ #include <ctype.h>
+-#include <error.h>
+ #include <errno.h>
+ #include <fcntl.h>
+ #include <netdb.h>
+@@ -90,8 +89,7 @@
+ # include <idna.h>
+ #endif
+ 
+-#include "ftp_var.h"
+-#include "unused-parameter.h"
++#include <ftp_var.h>
+ 
+ #if !HAVE_DECL_FCLOSE
+ /* Some systems don't declare fclose in <stdio.h>, so do it ourselves.  */
+@@ -144,7 +142,7 @@ hookup (char *host, int port)
+   status = idna_to_ascii_lz (host, &rhost, 0);
+   if (status)
+     {
+-      error (0, 0, "%s: %s", host, idna_strerror (status));
++      fprintf(stderr, "%s: %s\n", host, idna_strerror(status));
+       code = -1;
+       return ((char *) 0);
+     }
+@@ -169,7 +167,7 @@ hookup (char *host, int port)
+   status = getaddrinfo (rhost, portstr, &hints, &res);
+   if (status)
+     {
+-      error (0, 0, "%s: %s", rhost, gai_strerror (status));
++      fprintf(stderr, "%s: %s\n", rhost, gai_strerror(status));
+       code = -1;
+       free (rhost);
+       return ((char *) 0);
+@@ -190,7 +188,7 @@ hookup (char *host, int port)
+         {
+ 	  getnameinfo (ai->ai_addr, ai->ai_addrlen, ia, sizeof (ia),
+ 			NULL, 0, NI_NUMERICHOST);
+-	  error (0, 0, "Trying %s ...", ia);
++      fprintf(stderr, "Trying %s ...\n", ia);
+ 	}
+ 
+       s = socket (ai->ai_family, ai->ai_socktype, ai->ai_protocol);
+@@ -200,8 +198,10 @@ hookup (char *host, int port)
+       timeout.tv_sec = FTP_CONNECT_TIMEOUT;
+       timeout.tv_usec = 0;
+       if (setsockopt (s, SOL_SOCKET, SO_SNDTIMEO, &timeout,
+-			sizeof (timeout)) < 0 && debug)
+-	error (0, errno, "setsockopt (SO_SNDTIMEO)");
++			sizeof (timeout)) < 0 && debug) {
++        fprintf(stderr, "setsockopt(SO_SNDTIMEO)\n");
++        exit(1);
++      }
+ 
+       if (connect (s, ai->ai_addr, ai->ai_addrlen) < 0)
+ 	{
+@@ -209,7 +209,7 @@ hookup (char *host, int port)
+ 
+ 	  getnameinfo (ai->ai_addr, ai->ai_addrlen, ia, sizeof (ia),
+ 			NULL, 0, NI_NUMERICHOST);
+-	  error (0, oerrno, "connect to address %s", ia);
++      fprintf(stderr, "connect to address %s\n", ia);
+ 	  close (s);
+ 	  s = -1;
+ 	  continue;
+@@ -231,7 +231,7 @@ hookup (char *host, int port)
+ 
+   if (ai == NULL)
+     {
+-      error (0, 0, "no response from host");
++      fprintf(stderr, "no response from host\n");
+       code = -1;
+       goto bad;
+     }
+@@ -239,7 +239,7 @@ hookup (char *host, int port)
+   len = sizeof (myctladdr);
+   if (getsockname (s, (struct sockaddr *) &myctladdr, &len) < 0)
+     {
+-      error (0, errno, "getsockname");
++      fprintf(stderr, "getsockname\n");
+       code = -1;
+       goto bad;
+     }
+@@ -247,8 +247,9 @@ hookup (char *host, int port)
+ #if defined IP_TOS && defined IPPROTO_IP && defined IPTOS_LOWDELAY
+   tos = IPTOS_LOWDELAY;
+   if (myctladdr.ss_family == AF_INET &&
+-	setsockopt (s, IPPROTO_IP, IP_TOS, (char *) &tos, sizeof (int)) < 0)
+-    error (0, errno, "setsockopt TOS (ignored)");
++	setsockopt (s, IPPROTO_IP, IP_TOS, (char *) &tos, sizeof (int)) < 0) {
++    fprintf(stderr, "setsockopt TOS (ignored)\n");
++  }
+ #endif
+ 
+   cin = fdopen (s, "r");
+@@ -257,7 +258,7 @@ hookup (char *host, int port)
+   cout = fdopen (dup (s), "w");
+   if (cin == NULL || cout == NULL)
+     {
+-      error (0, 0, "fdopen failed.");
++      fprintf(stderr, "fdopen failed\n");
+       if (cin)
+ 	fclose (cin);
+       if (cout)
+@@ -284,7 +285,7 @@ hookup (char *host, int port)
+     if (setsockopt (s, SOL_SOCKET, SO_OOBINLINE, (char *) &on, sizeof (on))
+ 	< 0 && debug)
+       {
+-	error (0, errno, "setsockopt");
++        fprintf(stderr, "setsockopt\n");
+       }
+   }
+ #endif /* SO_OOBINLINE */
+@@ -379,7 +380,7 @@ login (char *host)
+     }
+   if (n != COMPLETE)
+     {
+-      error (0, 0, "Login failed.");
++      fprintf(stderr, "Login failed\n");
+       return (0);
+     }
+   if (!aflag && acct != NULL)
+@@ -410,7 +411,7 @@ login (char *host)
+ }
+ 
+ void
+-cmdabort (int sig _GL_UNUSED_PARAMETER)
++cmdabort (int sig)
+ {
+ 
+   printf ("\n");
+@@ -444,7 +445,7 @@ command (const char *fmt, ...)
+     }
+   if (cout == NULL)
+     {
+-      error (0, 0, "No control connection for command");
++      fprintf(stderr, "No control connection for command\n");
+       code = -1;
+       return (0);
+     }
+@@ -540,7 +541,10 @@ getreply (int expecteof)
+ 	  if (pflag == 2)
+ 	    {
+ 	      if (c != '\r' && c != ')')
+-		*pt++ = c;
++		{
++		  if (pt < &pasv[sizeof(pasv) - 1])
++		    *pt++ = c;
++		}
+ 	      else
+ 		{
+ 		  *pt = '\0';
+@@ -594,7 +598,7 @@ empty (fd_set *mask, int sec)
+ jmp_buf sendabort;
+ 
+ void
+-abortsend (int sig _GL_UNUSED_PARAMETER)
++abortsend (int sig)
+ {
+ 
+   mflag = 0;
+@@ -664,7 +668,7 @@ sendrequest (char *cmd, char *local, char *remote, int printnames)
+       fin = popen (local + 1, "r");
+       if (fin == NULL)
+ 	{
+-	  error (0, errno, "%s", local + 1);
++    fprintf(stderr, "%s\n", local + 1);
+ 	  signal (SIGINT, oldintr);
+ 	  signal (SIGPIPE, oldintp);
+ 	  code = -1;
+@@ -677,7 +681,7 @@ sendrequest (char *cmd, char *local, char *remote, int printnames)
+       fin = fopen (local, "r");
+       if (fin == NULL)
+ 	{
+-	  error (0, errno, "local: %s", local);
++    fprintf(stderr, "local: %s\n", local);
+ 	  signal (SIGINT, oldintr);
+ 	  code = -1;
+ 	  return;
+@@ -725,7 +729,7 @@ sendrequest (char *cmd, char *local, char *remote, int printnames)
+ 	{
+ 	  (void) command ("ABOR");
+ 	  getreply (0);
+-	  error (0, errno, "local: %s", local);
++    fprintf(stderr, "local: %s\n", local);
+ 	  restart_point = 0;
+ 	  if (closefunc != NULL)
+ 	    (*closefunc) (fin);
+@@ -772,7 +776,7 @@ sendrequest (char *cmd, char *local, char *remote, int printnames)
+       buf = malloc ((unsigned) blksize);
+       if (buf == NULL)
+ 	{
+-	  error (0, errno, "malloc");
++    fprintf(stderr, "malloc\n");
+ 	  bufsize = 0;
+ 	  goto abort;
+ 	}
+@@ -811,11 +815,11 @@ sendrequest (char *cmd, char *local, char *remote, int printnames)
+ 	  fflush (stdout);
+ 	}
+       if (c < 0)
+-	error (0, errno, "local: %s", local);
++      fprintf(stderr, "local: %s\n", local);
+       if (d < 0)
+ 	{
+ 	  if (errno != EPIPE)
+-	    error (0, errno, "netout");
++      fprintf(stderr, "netout\n");
+ 	  bytes = -1;
+ 	}
+       break;
+@@ -851,11 +855,12 @@ sendrequest (char *cmd, char *local, char *remote, int printnames)
+ 	  fflush (stdout);
+ 	}
+       if (ferror (fin))
+-	error (0, errno, "local: %s", local);
++        fprintf(stderr, "local: %s\n", local);
+       if (ferror (dout))
+ 	{
+ 	  if (errno != EPIPE)
+-	    error (0, errno, "netout");
++      fprintf(stderr, "netout\n");
++      exit(errno);
+ 	  bytes = -1;
+ 	}
+       break;
+@@ -899,7 +904,7 @@ abort:
+ jmp_buf recvabort;
+ 
+ void
+-abortrecv (int sig _GL_UNUSED_PARAMETER)
++abortrecv (int sig)
+ {
+ 
+   mflag = 0;
+@@ -1011,7 +1016,7 @@ recvrequest (char *cmd, char *local, char *remote, char *lmode, int printnames)
+       fout = popen (local + 1, "w");
+       if (fout == NULL)
+ 	{
+-	  error (0, errno, "%s", local + 1);
++    fprintf(stderr, "%s\n", local + 1);
+ 	  goto abort;
+ 	}
+       closefunc = pclose;
+@@ -1023,7 +1028,7 @@ recvrequest (char *cmd, char *local, char *remote, char *lmode, int printnames)
+       fout = fopen (local, lmode);
+       if (fout == NULL || fstat (fileno (fout), &st) < 0)
+ 	{
+-	  error (0, errno, "local: %s", local);
++    fprintf(stderr, "local: %s\n", local);
+ 	  goto abort;
+ 	}
+       closefunc = fclose;
+@@ -1036,7 +1041,7 @@ recvrequest (char *cmd, char *local, char *remote, char *lmode, int printnames)
+       buf = malloc ((unsigned) blksize);
+       if (buf == NULL)
+ 	{
+-	  error (0, errno, "malloc");
++    fprintf(stderr, "malloc\n");
+ 	  bufsize = 0;
+ 	  goto abort;
+ 	}
+@@ -1051,7 +1056,7 @@ recvrequest (char *cmd, char *local, char *remote, char *lmode, int printnames)
+     case TYPE_L:
+       if (restart_point && lseek (fileno (fout), restart_point, SEEK_SET) < 0)
+ 	{
+-	  error (0, errno, "local: %s", local);
++    fprintf(stderr, "local: %s\n", local);
+ 	  if (closefunc != NULL)
+ 	    (*closefunc) (fout);
+ 	  return;
+@@ -1083,15 +1088,15 @@ recvrequest (char *cmd, char *local, char *remote, char *lmode, int printnames)
+       if (c < 0)
+ 	{
+ 	  if (errno != EPIPE)
+-	    error (0, errno, "netin");
++    fprintf(stderr, "netin\n");
+ 	  bytes = -1;
+ 	}
+       if (d < c)
+ 	{
+ 	  if (d < 0)
+-	    error (0, errno, "local: %s", local);
++      fprintf(stderr, "local: %s\n", local);
+ 	  else
+-	    error (0, 0, "%s: short write", local);
++      fprintf(stderr, "%s: short write\n", local);
+ 	}
+       break;
+ 
+@@ -1125,7 +1130,7 @@ recvrequest (char *cmd, char *local, char *remote, char *lmode, int printnames)
+ 		printf ("Action not taken: offset %jd is outside of %s.\n",
+ 		       restart_point, local);
+ 	      else
+-		error (0, errno, "local: %s", local);
++          fprintf(stderr, "local: %s\n", local);
+ 
+ 	      if (closefunc != NULL)
+ 		(*closefunc) (fout);
+@@ -1180,11 +1185,11 @@ recvrequest (char *cmd, char *local, char *remote, char *lmode, int printnames)
+       if (ferror (din))
+ 	{
+ 	  if (errno != EPIPE)
+-	    error (0, errno, "netin");
++      fprintf(stderr, "netin\n");
+ 	  bytes = -1;
+ 	}
+       if (ferror (fout))
+-	error (0, errno, "local: %s", local);
++      fprintf(stderr, "local: %s\n", local);
+       break;
+     }
+   if (closefunc != NULL)
+@@ -1258,7 +1263,7 @@ initconn (void)
+ 	  setsockopt (data, SOL_SOCKET, SO_DEBUG, (char *) &on,
+ 		      sizeof (on)) < 0)
+ 	if (errno != EACCES)	/* Ignore insufficient permission.  */
+-	  error (0, errno, "setsockopt DEBUG (ignored)");
++    fprintf(stderr, "setsockopt DEBUG (ignored)\n");
+ 
+       /* Be contemporary:
+        *   first try EPSV,
+@@ -1455,7 +1460,7 @@ noport:
+   data = socket (myctladdr.ss_family, SOCK_STREAM, 0);
+   if (data < 0)
+     {
+-      error (0, errno, "socket");
++      fprintf(stderr, "socket\n");
+       if (tmpno)
+ 	sendport = 1;
+       return (1);
+@@ -1464,27 +1469,27 @@ noport:
+     if (setsockopt (data, SOL_SOCKET, SO_REUSEADDR, (char *) &on, sizeof (on))
+ 	< 0)
+       {
+-	error (0, errno, "setsockopt (reuse address)");
++        fprintf(stderr, "setsockopt (reuse address)\n");
+ 	goto bad;
+       }
+   if (bind (data, (struct sockaddr *) &data_addr, ctladdrlen) < 0)
+     {
+-      error (0, errno, "bind");
++      fprintf(stderr, "bind\n");
+       goto bad;
+     }
+   if (options & SO_DEBUG
+       && setsockopt (data, SOL_SOCKET, SO_DEBUG,
+ 		     (char *) &on, sizeof (on)) < 0)
+     if (errno != EACCES)	/* Ignore insufficient permission.  */
+-      error (0, errno, "setsockopt DEBUG (ignored)");
++      fprintf(stderr, "setsockopt DEBUG (ignored)\n");
+   len = sizeof (data_addr);
+   if (getsockname (data, (struct sockaddr *) &data_addr, &len) < 0)
+     {
+-      error (0, errno, "getsockname");
++      fprintf(stderr, "getsockname\n");
+       goto bad;
+     }
+   if (listen (data, 1) < 0)
+-    error (0, errno, "listen");
++    fprintf(stderr, "listen\n");
+   if (sendport)
+     {
+ #define UC(b)	(((int)b)&0xff)
+@@ -1558,7 +1563,7 @@ noport:
+   on = IPTOS_THROUGHPUT;
+   if (data_addr.ss_family == AF_INET &&
+ 	setsockopt (data, IPPROTO_IP, IP_TOS, (char *) &on, sizeof (int)) < 0)
+-    error (0, errno, "setsockopt TOS (ignored)");
++    fprintf(stderr, "setsockopt TOS (ignored)\n");
+ #endif
+   return (0);
+ bad:
+@@ -1581,7 +1586,7 @@ dataconn (char *lmode)
+   s = accept (data, (struct sockaddr *) &from, &fromlen);
+   if (s < 0)
+     {
+-      error (0, errno, "accept");
++      fprintf(stderr, "accept\n");
+       close (data), data = -1;
+       return (NULL);
+     }
+@@ -1591,7 +1596,7 @@ dataconn (char *lmode)
+   tos = IPTOS_THROUGHPUT;
+   if (from.ss_family == AF_INET &&
+ 	setsockopt (s, IPPROTO_IP, IP_TOS, (char *) &tos, sizeof (int)) < 0)
+-    error (0, errno, "setsockopt TOS (ignored)");
++    fprintf(stderr, "setsockopt TOS (ignored)\n");
+ #endif
+   return (fdopen (data, lmode));
+ }
+@@ -1645,7 +1650,7 @@ tvsub (struct timeval *tdiff, struct timeval *t1, struct timeval *t0)
+ }
+ 
+ void
+-psabort (int sig _GL_UNUSED_PARAMETER)
++psabort (int sig)
+ {
+ 
+   abrtflag++;
+@@ -1758,7 +1763,7 @@ pswitch (int flag)
+ }
+ 
+ void
+-abortpt (int sig _GL_UNUSED_PARAMETER)
++abortpt (int sig)
+ {
+ 
+   printf ("\n");
+@@ -1882,7 +1887,7 @@ abort:
+ 	{
+ 	  if (nfnd < 0)
+ 	    {
+-	      error (0, errno, "abort");
++        fprintf(stderr, "abort\n");
+ 	    }
+ 	  if (ptabflg)
+ 	    code = -1;
+@@ -1900,7 +1905,7 @@ abort:
+ }
+ 
+ void
+-reset (int argc _GL_UNUSED_PARAMETER, char **argv _GL_UNUSED_PARAMETER)
++reset (int argc, char **argv)
+ {
+   fd_set mask;
+   int nfnd = 1;
+@@ -1911,7 +1916,7 @@ reset (int argc _GL_UNUSED_PARAMETER, char **argv _GL_UNUSED_PARAMETER)
+       FD_SET (fileno (cin), &mask);
+       if ((nfnd = empty (&mask, 0)) < 0)
+ 	{
+-	  error (0, errno, "reset");
++    fprintf(stderr, "reset\n");
+ 	  code = -1;
+ 	  lostpeer (0);
+ 	}
+@@ -1989,8 +1994,9 @@ abort_remote (FILE *din)
+    * after urgent byte rather than before as is protocol now
+    */
+   sprintf (buf, "%c%c%c", IAC, IP, IAC);
+-  if (send (fileno (cout), buf, 3, MSG_OOB) != 3)
+-    error (0, errno, "abort");
++  if (send (fileno (cout), buf, 3, MSG_OOB) != 3) {
++    fprintf(stderr, "abort\n");
++  }
+   fprintf (cout, "%cABOR\r\n", DM);
+   fflush (cout);
+   FD_ZERO (&mask);
+@@ -2003,7 +2009,7 @@ abort_remote (FILE *din)
+     {
+       if (nfnd < 0)
+ 	{
+-	  error (0, errno, "abort");
++    fprintf(stderr, "abort\n");
+ 	}
+       if (ptabflg)
+ 	code = -1;
+-- 
+2.25.1
+
