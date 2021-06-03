@@ -82,10 +82,12 @@ LIBINETUTILSSRCS-$(CONFIG_LIBINETUTILS_MAIN_FUNCTION) += $(LIBINETUTILS_BASE)/ma
 ################################################################################
 # Inetutils code -- libicmp
 ################################################################################
+ifeq ($(LIBINETUTILS_LIBICMP),y)
 LIBINETUTILS_SRCS-y += $(LIBINETUTILS_SRC)/libicmp/icmp_address.c
 LIBINETUTILS_SRCS-y += $(LIBINETUTILS_SRC)/libicmp/icmp_cksum.c
 LIBINETUTILS_SRCS-y += $(LIBINETUTILS_SRC)/libicmp/icmp_echo.c
 LIBINETUTILS_SRCS-y += $(LIBINETUTILS_SRC)/libicmp/icmp_timestamp.c
+endif
 
 ################################################################################
 # Inetutils code -- ping
@@ -117,4 +119,11 @@ LIBINETUTILS_SRCS-y += $(LIBINETUTILS_SRC)/ftp/domacro.c
 LIBINETUTILS_SRCS-y += $(LIBINETUTILS_SRC)/ftp/ftp.c
 LIBINETUTILS_SRCS-y += $(LIBINETUTILS_SRC)/ftp/ruserpass.c
 LIBINETUTILS_SRCS-y += $(LIBINETUTILS_SRC)/ftp/main.c
+endif
+
+################################################################################
+# Inetutils code -- whois
+################################################################################
+ifeq ($(CONFIG_LIBINETUTILS_WHOIS),y)
+LIBINETUTILS_SRCS-y += $(LIBINETUTILS_SRC)/whois/whois.c
 endif
