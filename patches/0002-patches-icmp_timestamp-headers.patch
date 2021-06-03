@@ -1,7 +1,7 @@
 From 49f8b25c1dd8e39a08fbd2427471ac8144610535 Mon Sep 17 00:00:00 2001
 From: Ethan Cotterell <ethancotterell@gmail.com>
 Date: Thu, 20 May 2021 23:06:05 +0100
-Subject: [PATCH] patches: icmp_timestamp headers
+Subject: [PATCH 02/14] patches: icmp_timestamp headers
 
 ---
  libicmp/icmp_timestamp.c | 2 +-
@@ -12,7 +12,7 @@ index 82e62ba0..ddcf4cc4 100644
 --- a/libicmp/icmp_timestamp.c
 +++ b/libicmp/icmp_timestamp.c
 @@ -28,7 +28,7 @@
-
+ 
  #include <netinet/in_systm.h>
  #include <netinet/in.h>
 -#include <netinet/ip.h>
@@ -20,5 +20,6 @@ index 82e62ba0..ddcf4cc4 100644
  /*#include <netinet/ip_icmp.h> -- deliberately not including this */
  #include <arpa/inet.h>
  #include <icmp.h>
---
+-- 
 2.25.1
+

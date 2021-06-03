@@ -1,7 +1,7 @@
 From 4c4c1420a256c8bc408f1099c8613619a16b304b Mon Sep 17 00:00:00 2001
 From: Ethan Cotterell <ethancotterell@gmail.com>
 Date: Fri, 21 May 2021 13:34:23 +0100
-Subject: [PATCH] patches: ftp domacro patches
+Subject: [PATCH 13/14] patches: ftp domacro patches
 
 ---
  ftp/domacro.c | 2 +-

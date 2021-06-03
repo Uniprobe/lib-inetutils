@@ -1,7 +1,7 @@
 From c4d31ccaeca585393ec12039a212bd9b4940bc98 Mon Sep 17 00:00:00 2001
 From: Ethan Cotterell <ethancotterell@gmail.com>
 Date: Thu, 20 May 2021 23:42:58 +0100
-Subject: [PATCH] patches: ping_echo header and struct patches
+Subject: [PATCH 06/14] patches: ping_echo header and struct patches
 
 ---
  ping/ping_echo.c | 100 +++++++++++++++++++++++++----------------------

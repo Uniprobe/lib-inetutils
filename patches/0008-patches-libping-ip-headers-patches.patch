@@ -1,7 +1,7 @@
 From 4755e5c72b1bf3085aeba28019c4d37272303393 Mon Sep 17 00:00:00 2001
 From: Ethan Cotterell <ethancotterell@gmail.com>
 Date: Fri, 21 May 2021 08:50:37 +0100
-Subject: [PATCH] patches: libping ip headers patches
+Subject: [PATCH 08/14] patches: libping ip headers patches
 
 ---
  ping/libping.c | 10 +++++-----

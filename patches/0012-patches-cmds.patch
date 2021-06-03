@@ -1,7 +1,7 @@
 From c4074b3c036b41af192b4edf7ff7fde5284d232b Mon Sep 17 00:00:00 2001
 From: Ethan Cotterell <ethancotterell@gmail.com>
 Date: Fri, 21 May 2021 13:28:58 +0100
-Subject: [PATCH] patches: cmds
+Subject: [PATCH 12/14] patches: cmds
 
 ---
  ftp/cmds.c | 106 ++++++++++++++++++++++++++---------------------------

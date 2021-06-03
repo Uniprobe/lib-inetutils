@@ -1,7 +1,7 @@
 From d9c2e3b76b0bd5b9181729a2a17a33adc4b63097 Mon Sep 17 00:00:00 2001
 From: Ethan Cotterell <ethancotterell@gmail.com>
 Date: Fri, 21 May 2021 08:57:50 +0100
-Subject: [PATCH] patches: ping patches
+Subject: [PATCH 09/14] patches: ping patches
 
 ---
  ping/ping.c | 74 +++++++++++++++++++++++++++++++++--------------------

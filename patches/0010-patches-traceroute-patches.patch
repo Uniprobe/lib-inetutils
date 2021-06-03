@@ -1,7 +1,7 @@
 From e5d8d9343cdc9f2f62cb90a7e9d3de22ba9cc9e0 Mon Sep 17 00:00:00 2001
 From: Ethan Cotterell <ethancotterell@gmail.com>
 Date: Fri, 21 May 2021 12:15:42 +0100
-Subject: [PATCH] patches: traceroute patches
+Subject: [PATCH 10/14] patches: traceroute patches
 
 ---
  src/traceroute.c | 165 +++++++++++++++++++++++++++++------------------

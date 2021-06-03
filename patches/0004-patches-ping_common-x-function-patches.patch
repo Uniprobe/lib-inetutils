@@ -1,7 +1,7 @@
 From 698665e5f11b6f3e8457990782850f95fe3f1a69 Mon Sep 17 00:00:00 2001
 From: Ethan Cotterell <ethancotterell@gmail.com>
 Date: Thu, 20 May 2021 23:23:13 +0100
-Subject: [PATCH] patches: ping_common x function patches
+Subject: [PATCH 04/14] patches: ping_common x function patches
 
 ---
  ping/ping_common.c | 41 ++++++++++++++++++++++-------------------

@@ -1,7 +1,7 @@
 From 80ca8061f7684b8ef91dc1911f2a0c72a7bc7690 Mon Sep 17 00:00:00 2001
 From: Ethan Cotterell <ethancotterell@gmail.com>
 Date: Fri, 21 May 2021 13:28:37 +0100
-Subject: [PATCH] patches: cmdtab
+Subject: [PATCH 11/14] patches: cmdtab
 
 ---
  ftp/cmdtab.c | 2 +-

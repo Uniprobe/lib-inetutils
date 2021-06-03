@@ -1,7 +1,7 @@
 From bc63622a9ff0a7336eb6f62e0145d6c3ebc90055 Mon Sep 17 00:00:00 2001
 From: Ethan Cotterell <ethancotterell@gmail.com>
 Date: Fri, 21 May 2021 08:43:29 +0100
-Subject: [PATCH] patches: ping_timestamp ip headers patch
+Subject: [PATCH 07/14] patches: ping_timestamp ip headers patch
 
 ---
  ping/ping_timestamp.c | 18 ++++++++++--------

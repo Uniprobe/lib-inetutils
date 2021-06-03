@@ -1,7 +1,7 @@
 From 040cb4f05c380ba6134767131e3cbfe20398c519 Mon Sep 17 00:00:00 2001
 From: Ethan Cotterell <ethancotterell@gmail.com>
 Date: Thu, 20 May 2021 23:04:15 +0100
-Subject: [PATCH] patches: icmp_address headers
+Subject: [PATCH 01/14] patches: icmp_address headers
 
 ---
  libicmp/icmp_address.c | 2 +-
@@ -12,7 +12,7 @@ index c9680193..3dc29719 100644
 --- a/libicmp/icmp_address.c
 +++ b/libicmp/icmp_address.c
 @@ -26,7 +26,7 @@
-
+ 
  #include <netinet/in_systm.h>
  #include <netinet/in.h>
 -#include <netinet/ip.h>
@@ -20,5 +20,6 @@ index c9680193..3dc29719 100644
  /*#include <netinet/ip_icmp.h> -- deliberately not including this */
  #include <arpa/inet.h>
  #include <icmp.h>
---
+-- 
 2.25.1
+
