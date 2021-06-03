@@ -3,11 +3,12 @@ menuconfig LIBINETUTILS
 	default n
 
 if LIBINETUTILS
-config LIBINETUTILS_MAIN_FUNCTION
-  bool "Provide main function"
-  default n
+config LIBINETUTILS_LIBICMP
+	bool "Provide ICMP functionality"
+	default n
 
 menuconfig LIBINETUTILS_PING
+	select LIBINETUTILS_LIBICMP
 	bool "Provide ping functionality"
 	default n
 
@@ -18,6 +19,7 @@ config LIBINETUTILS_PING_MAIN_FUNCTION
 endif
 
 menuconfig LIBINETUTILS_TRACEROUTE
+	select LIBINETUTILS_LIBICMP
 	bool "Provide traceroute functionality"
 	default n
 
@@ -34,8 +36,13 @@ menuconfig LIBINETUTILS_FTP
 
 if LIBINETUTILS_FTP
 config LIBINETUTILS_FTP_MAIN_FUNCTION
-	default "Provide ftp main function"
+	bool "Provide ftp main function"
 	default n
 endif
+
+menuconfig LIBINETUTILS_WHOIS
+	bool "Provide whois functionality"
+	default n
+
 
 endif
