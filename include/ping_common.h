@@ -23,7 +23,7 @@
 #include <lwip/ip.h>
 #include <lwip/prot/icmp6.h>
 #include <icmp.h>
-#include <progname.h>
+// #include <progname.h>
 
 #include <stdbool.h>
 
