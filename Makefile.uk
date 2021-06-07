@@ -56,10 +56,17 @@ LIBINETUTILS_SRC = $(LIBINETUTILS_ORIGIN)/$(LIBINETUTILS_SUBDIR)
 ################################################################################
 CINCLUDES-y += -I$(LIBINETUTILS_BASE)/include
 
+ifeq ($(CONFIG_LIBINETUTILS_LIBICMP),y)
+CINCLUDES-y += -I$(LIBINETUTILS_SRC)/libicmp
+endif
+
+ifeq ($(CONFIG_LIBINETUTILS_PING),y)
+CINCLUDES-y += -I$(LIBINETUTILS_SRC)/ping
+endif
 ################################################################################
 # Flags
 ################################################################################
-LIBINETUTILS_FLAGS = -DDEBUG -D_LIBC
+LIBINETUTILS_FLAGS = -D_LIBC
 
 # Suppress some warnings to make the build process look neater
 LIBINETUTILS_FLAGS_SUPPRESS += -Wunused-parameter
@@ -82,21 +89,22 @@ LIBINETUTILSSRCS-$(CONFIG_LIBINETUTILS_MAIN_FUNCTION) += $(LIBINETUTILS_BASE)/ma
 ################################################################################
 # Inetutils code -- libicmp
 ################################################################################
+ifeq ($(CONFIG_LIBINETUTILS_LIBICMP),y)
 LIBINETUTILS_SRCS-y += $(LIBINETUTILS_SRC)/libicmp/icmp_address.c
 LIBINETUTILS_SRCS-y += $(LIBINETUTILS_SRC)/libicmp/icmp_cksum.c
 LIBINETUTILS_SRCS-y += $(LIBINETUTILS_SRC)/libicmp/icmp_echo.c
 LIBINETUTILS_SRCS-y += $(LIBINETUTILS_SRC)/libicmp/icmp_timestamp.c
-
+endif
 ################################################################################
 # Inetutils code -- ping
 ################################################################################
 ifeq ($(CONFIG_LIBINETUTILS_PING),y)
+LIBINETUTILS_SRCS-y += $(LIBINETUTILS_SRC)/ping/libping.c
 LIBINETUTILS_SRCS-y += $(LIBINETUTILS_SRC)/ping/ping_address.c
 LIBINETUTILS_SRCS-y += $(LIBINETUTILS_SRC)/ping/ping_common.c
 LIBINETUTILS_SRCS-y += $(LIBINETUTILS_SRC)/ping/ping_echo.c
 LIBINETUTILS_SRCS-y += $(LIBINETUTILS_SRC)/ping/ping_router.c
 LIBINETUTILS_SRCS-y += $(LIBINETUTILS_SRC)/ping/ping_timestamp.c
-LIBINETUTILS_SRCS-y += $(LIBINETUTILS_SRC)/ping/libping.c
 LIBINETUTILS_SRCS-y += $(LIBINETUTILS_SRC)/ping/ping.c
 endif
 
