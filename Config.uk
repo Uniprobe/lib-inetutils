@@ -7,7 +7,12 @@ config LIBINETUTILS_MAIN_FUNCTION
   bool "Provide main function"
   default n
 
+menuconfig LIBINETUTILS_LIBICMP
+	bool "Provide libicmp library"
+	default n
+
 menuconfig LIBINETUTILS_PING
+	select LIBINETUTILS_LIBICMP
 	bool "Provide ping functionality"
 	default n
 
@@ -34,7 +39,7 @@ menuconfig LIBINETUTILS_FTP
 
 if LIBINETUTILS_FTP
 config LIBINETUTILS_FTP_MAIN_FUNCTION
-	default "Provide ftp main function"
+	bool "Provide ftp main function"
 	default n
 endif
 
