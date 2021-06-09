@@ -55,6 +55,7 @@ LIBINETUTILS_SRC = $(LIBINETUTILS_ORIGIN)/$(LIBINETUTILS_SUBDIR)
 # Library includes
 ################################################################################
 CINCLUDES-y += -I$(LIBINETUTILS_BASE)/include
+CINCLUDES-y += -I$(LIBINETUTILS_BASE)/include-internal
 
 ifeq ($(CONFIG_LIBINETUTILS_LIBICMP),y)
 CINCLUDES-y += -I$(LIBINETUTILS_SRC)/libicmp
