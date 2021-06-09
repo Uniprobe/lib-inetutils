@@ -1,0 +1,58 @@
+From 50aab27921b9d928e157cf670f158dae1df7d6cc Mon Sep 17 00:00:00 2001
+From: Ethan Cotterell <ethancotterell@gmail.com>
+Date: Mon, 7 Jun 2021 18:07:36 +0100
+Subject: [PATCH 01/11] libicmp: fix struct ip in icmp struct and function
+ definitions
+
+---
+ libicmp/icmp.h | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/libicmp/icmp.h b/libicmp/icmp.h
+index be46dfc5..ad779a99 100644
+--- a/libicmp/icmp.h
++++ b/libicmp/icmp.h
+@@ -18,6 +18,8 @@
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see `http://www.gnu.org/licenses/'. */
+ 
++#include <lwip/prot/ip4.h>
++
+ /*
+  * Structure of an icmp header.
+  */
+@@ -76,7 +78,7 @@ struct icmp_header
+     } id_ts;
+     struct id_ip		/* Original IP header */
+     {
+-      struct ip idi_ip;
++      struct ip_hdr idi_ip;
+       /* options and then 64 bits of data */
+     } id_ip;
+     unsigned long id_mask;		/* ICMP_ADDRESS, ICMP_ADDRESSREPLY */
+@@ -143,7 +145,7 @@ struct icmp_header
+ #define ICMP_MINLEN	8	/* abs minimum */
+ #define ICMP_TSLEN	(8 + 3 * sizeof (n_time))	/* timestamp */
+ #define ICMP_MASKLEN	12	/* address mask */
+-#define ICMP_ADVLENMIN	(8 + sizeof (struct ip) + 8)	/* min */
++#define ICMP_ADVLENMIN	(8 + sizeof (struct ip_hdr) + 8)	/* min */
+ #define ICMP_ADVLEN(p)	(8 + ((p)->icmp_ip.ip_hl << 2) + 8)
+ 	/* N.B.: must separately check that ip_hl >= 5 */
+ 
+@@ -151,11 +153,11 @@ unsigned short icmp_cksum (unsigned char * addr, int len);
+ int icmp_generic_encode (unsigned char * buffer, size_t bufsize, int type, int ident,
+ 			 int seqno);
+ int icmp_generic_decode (unsigned char * buffer, size_t bufsize,
+-			 struct ip **ipp, icmphdr_t ** icmpp);
++			 struct ip_hdr **ipp, icmphdr_t ** icmpp);
+ 
+ int icmp_echo_encode (unsigned char * buffer, size_t bufsize, int ident, int seqno);
+ int icmp_echo_decode (unsigned char * buffer, size_t bufsize,
+-		      struct ip **ip, icmphdr_t ** icmp);
++		      struct ip_hdr **ip, icmphdr_t ** icmp);
+ int icmp_timestamp_encode (unsigned char * buffer, size_t bufsize,
+ 			   int ident, int seqno);
+ int icmp_address_encode (unsigned char * buffer, size_t bufsize, int ident,
+-- 
+2.25.1
+
