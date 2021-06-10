@@ -1,7 +1,7 @@
 From 455c706b77d1654a4f8d0a767b768d91b914b491 Mon Sep 17 00:00:00 2001
 From: Ethan Cotterell <ethancotterell@gmail.com>
 Date: Mon, 7 Jun 2021 22:35:04 +0100
-Subject: [PATCH 09/11] ping: fix ip struct and error function calls
+Subject: [PATCH 09/13] ping: fix ip struct and error function calls
 
 ---
  ping/ping_echo.c | 98 +++++++++++++++++++++++++++---------------------

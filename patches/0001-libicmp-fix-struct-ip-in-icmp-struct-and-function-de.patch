@@ -1,7 +1,7 @@
 From 50aab27921b9d928e157cf670f158dae1df7d6cc Mon Sep 17 00:00:00 2001
 From: Ethan Cotterell <ethancotterell@gmail.com>
 Date: Mon, 7 Jun 2021 18:07:36 +0100
-Subject: [PATCH 01/11] libicmp: fix struct ip in icmp struct and function
+Subject: [PATCH 01/13] libicmp: fix struct ip in icmp struct and function
  definitions
 
 ---
