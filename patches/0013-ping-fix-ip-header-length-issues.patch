@@ -1,0 +1,81 @@
+From efecc0c4713cd300af559758eefe8a04286e3daa Mon Sep 17 00:00:00 2001
+From: Ethan Cotterell <ethancotterell@gmail.com>
+Date: Thu, 10 Jun 2021 12:30:19 +0100
+Subject: [PATCH 13/13] ping: fix ip header length issues
+
+---
+ ping/ping.c      |  4 ++--
+ ping/ping_echo.c | 14 +++++++++-----
+ 2 files changed, 11 insertions(+), 7 deletions(-)
+
+diff --git a/ping/ping.c b/ping/ping.c
+index 7ba32eaa..2bf4131e 100644
+--- a/ping/ping.c
++++ b/ping/ping.c
+@@ -546,8 +546,8 @@ ping_finish (void)
+ {
+   fflush (stdout);
+   printf ("--- %s ping statistics ---\n", ping->ping_hostname);
+-  printf ("%zu packets transmitted, ", ping->ping_num_xmit);
+-  printf ("%zu packets received, ", ping->ping_num_recv);
++  printf ("%lu packets transmitted, ", (unsigned long)ping->ping_num_xmit);
++  printf ("%lu packets received, ", (unsigned long)ping->ping_num_recv);
+   if (ping->ping_num_rept)
+     printf ("+%zu duplicates, ", ping->ping_num_rept);
+   if (ping->ping_num_xmit)
+diff --git a/ping/ping_echo.c b/ping/ping_echo.c
+index 8c2b40bf..b3380484 100644
+--- a/ping/ping_echo.c
++++ b/ping/ping_echo.c
+@@ -150,7 +150,7 @@ ping_echo (char *hostname)
+ #endif /* IP_OPTIONS */
+     }
+ 
+-  printf ("PING %s (%s): %zu data bytes",
++  printf ("PING %s (%s): %lu data bytes",
+ 	  ping->ping_hostname,
+ 	  inet_ntoa (ping->ping_dest.ping_sockaddr.sin_addr), data_length);
+   if (options & OPT_VERBOSE)
+@@ -197,7 +197,8 @@ print_echo (int dupflag, struct ping_stat *ping_stat,
+ 
+   /* Length of IP header */
+   // hlen = ip->ip_hl << 2;
+-	hlen = IPH_HL(ip);
++	// hlen = IPH_HL(ip);
++	hlen = (ip->_v_hl & 0x0F) << 2;
+ 
+   /* Length of ICMP header+payload */
+   datalen -= hlen;
+@@ -315,7 +316,8 @@ print_ip_header (struct ip_hdr *ip)
+   unsigned char *cp;
+ 
+   // hlen = ip->ip_hl << 2;
+-	hlen = IPH_HL(ip);
++	// hlen = IPH_HL(ip);
++	hlen = (ip->_v_hl & 0x0F) << 2;
+   cp = (unsigned char *) ip + sizeof (*ip);	/* point to options */
+ 
+   if (options & OPT_VERBOSE)
+@@ -360,7 +362,8 @@ print_ip_data (icmphdr_t * icmp, void *data _GL_UNUSED_PARAMETER)
+   print_ip_header (ip);
+ 
+   // hlen = ip->ip_hl << 2;
+-	hlen = IPH_HL(ip);
++	// hlen = IPH_HL(ip);
++	hlen = (ip->_v_hl & 0x0F) << 2;
+   cp = (unsigned char *) ip + hlen;
+ 
+   if (ip->_proto == IPPROTO_TCP)
+@@ -428,7 +431,8 @@ print_icmp_header (struct sockaddr_in *from,
+ 
+   /* Length of the IP header */
+   // hlen = ip->ip_hl << 2;
+-	hlen = IPH_HL(ip);
++	// hlen = IPH_HL(ip);
++	hlen = (ip->_v_hl & 0x0F) << 2;
+   /* Original IP header */
+   orig_ip = &icmp->icmp_ip;
+ 
+-- 
+2.25.1
+

@@ -1,0 +1,25 @@
+From 8c2cd77a8806bd1f61857f2711f7ab457b6146ee Mon Sep 17 00:00:00 2001
+From: Ethan Cotterell <ethancotterell@gmail.com>
+Date: Thu, 10 Jun 2021 11:44:30 +0100
+Subject: [PATCH 12/13] libicmp: fix ip header length
+
+---
+ libicmp/icmp_echo.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libicmp/icmp_echo.c b/libicmp/icmp_echo.c
+index 1eaee8cb..d1bb2f53 100644
+--- a/libicmp/icmp_echo.c
++++ b/libicmp/icmp_echo.c
+@@ -65,7 +65,7 @@ icmp_generic_decode (unsigned char * buffer, size_t bufsize,
+   /* IP header */
+   ip = (struct ip_hdr *) buffer;
+ //  hlen = ip->ip_hl << 2;
+-  hlen = IPH_HL(ip);
++	hlen = (ip->_v_hl & 0x0F) << 2;
+   if (bufsize < hlen + ICMP_MINLEN)
+     return -1;
+ 
+-- 
+2.25.1
+

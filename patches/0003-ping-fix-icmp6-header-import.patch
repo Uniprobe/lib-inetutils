@@ -1,0 +1,37 @@
+From 184a82dfd271bfcff6cfc14978aec6a154cc5436 Mon Sep 17 00:00:00 2001
+From: Ethan Cotterell <ethancotterell@gmail.com>
+Date: Mon, 7 Jun 2021 18:56:39 +0100
+Subject: [PATCH 03/13] ping: fix icmp6 header import
+
+---
+ ping/ping_common.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/ping/ping_common.h b/ping/ping_common.h
+index 65e3e60b..f334799f 100644
+--- a/ping/ping_common.h
++++ b/ping/ping_common.h
+@@ -21,9 +21,9 @@
+ #include <netinet/in_systm.h>
+ #include <netinet/in.h>
+ #include <netinet/ip.h>
+-#include <netinet/icmp6.h>
++#include <lwip/prot/icmp6.h>
+ #include <icmp.h>
+-#include <error.h>
++// #include <error.h>
+ #include <progname.h>
+ 
+ #include <stdbool.h>
+@@ -90,7 +90,7 @@ typedef int (*ping_efp) (int code,
+ 			 void *closure,
+ 			 struct sockaddr_in * dest,
+ 			 struct sockaddr_in * from,
+-			 struct ip * ip, icmphdr_t * icmp, int datalen);
++			 struct ip_hdr * ip, icmphdr_t * icmp, int datalen);
+ 
+ union event {
+   ping_efp6 handler6;
+-- 
+2.25.1
+

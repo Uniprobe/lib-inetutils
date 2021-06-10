@@ -7,6 +7,10 @@ config LIBINETUTILS_LIBICMP
 	bool "Provide ICMP functionality"
 	default n
 
+menuconfig LIBINETUTILS_LIBICMP
+	bool "Provide libicmp library"
+	default n
+
 menuconfig LIBINETUTILS_PING
 	select LIBINETUTILS_LIBICMP
 	bool "Provide ping functionality"
