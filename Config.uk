@@ -3,50 +3,42 @@ menuconfig LIBINETUTILS
 	default n
 
 if LIBINETUTILS
-config LIBINETUTILS_LIBICMP
-	bool "Provide ICMP functionality"
-	default n
 
 menuconfig LIBINETUTILS_LIBICMP
 	bool "Provide libicmp library"
 	default n
+	help
+		Provides a set of functions related to creating, encoding and decoding
+		ICMP packets using a custom ICMP struct type.
 
-menuconfig LIBINETUTILS_PING
+config LIBINETUTILS_PING
 	select LIBINETUTILS_LIBICMP
 	bool "Provide ping functionality"
 	default n
 
-if LIBINETUTILS_PING
-config LIBINETUTILS_PING_MAIN_FUNCTION
-	bool "Provide ping main function"
-	default n
-endif
-
-menuconfig LIBINETUTILS_TRACEROUTE
+config LIBINETUTILS_TRACEROUTE
 	select LIBINETUTILS_LIBICMP
 	bool "Provide traceroute functionality"
 	default n
 
-if LIBINETUTILS_TRACEROUTE
-config LIBINETUTILS_TRACEROUTE_MAIN_FUNCTION
-	bool "Provide traceroute main function"
-	default n
-endif
+choice
+	prompt "Main function"
+	optional
 
+	config LIBINETUTILS_PING_MAIN_FUNCTION
+		depends on LIBINETUTILS_PING
+		bool "Ping"
+		default n
+		help
+			Start the unikernel using the main function from `ping`
 
-menuconfig LIBINETUTILS_FTP
-	bool "Provide ftp functionality"
-	default n
+	config LIBINETUTILS_TRACEROUTE_MAIN_FUNCTION
+		depends on LIBINETUTILS_TRACEROUTE
+		bool "Traceroute"
+		default n
+		help
+			Start the unikernel using the main function from `traceroute`
 
-if LIBINETUTILS_FTP
-config LIBINETUTILS_FTP_MAIN_FUNCTION
-	bool "Provide ftp main function"
-	default n
-endif
-
-menuconfig LIBINETUTILS_WHOIS
-	bool "Provide whois functionality"
-	default n
-
+endchoice
 
 endif
