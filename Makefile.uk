@@ -69,6 +69,18 @@ endif
 ################################################################################
 LIBINETUTILS_FLAGS = -D_LIBC
 
+ifeq ($(CONFIG_LIBINETUTILS_PING),y)
+ifneq ($(CONFIG_LIBINETUTILS_PING_MAIN_FUNCTION),y)
+LIBINETUTILS_FLAGS += -Dmain=ping_main
+endif
+endif
+
+ifeq ($(CONFIG_LIBINETUTILS_TRACEROUTE),y)
+ifneq ($(CONFIG_LIBINETUTILS_TRACEROUTE_MAIN_FUNCTION),y)
+LIBINETUTILS_FLAGS += -Dmain=traceroute_main
+endif
+endif
+
 # Suppress some warnings to make the build process look neater
 LIBINETUTILS_FLAGS_SUPPRESS += -Wunused-parameter
 
