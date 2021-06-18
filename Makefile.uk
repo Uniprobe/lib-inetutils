@@ -69,15 +69,17 @@ endif
 ################################################################################
 LIBINETUTILS_FLAGS = -D_LIBC
 
+# If not using ping main function, rename to `ping_main`
 ifeq ($(CONFIG_LIBINETUTILS_PING),y)
 ifneq ($(CONFIG_LIBINETUTILS_PING_MAIN_FUNCTION),y)
-LIBINETUTILS_FLAGS += -Dmain=ping_main
+LIBINETUTILS_PING_FLAGS += -Dmain=ping_main
 endif
 endif
 
+# If not using traceroute main function, rename to `traceroute_main`
 ifeq ($(CONFIG_LIBINETUTILS_TRACEROUTE),y)
 ifneq ($(CONFIG_LIBINETUTILS_TRACEROUTE_MAIN_FUNCTION),y)
-LIBINETUTILS_FLAGS += -Dmain=traceroute_main
+LIBINETUTILS_TRACEROUTE_FLAGS += -Dmain=traceroute_main
 endif
 endif
 
@@ -93,7 +95,7 @@ LIBINETUTILS_CFLAGS-y += $(LIBINETUTILS_FLAGS_SUPPRESS)
 # Include paths
 # LIBINETUTILS_CINCLUDES-y   += $(LIBINETUTILS_COMMON_INCLUDES-y)
 # LIBINETUTILS_CXXINCLUDES-y += $(LIBINETUTILS_COMMON_INCLUDES-y)
-LIBINETUTILSSRCS-$(CONFIG_LIBINETUTILS_MAIN_FUNCTION) += $(LIBINETUTILS_BASE)/main.c|unikraft
+# LIBINETUTILSSRCS-$(CONFIG_LIBINETUTILS_MAIN_FUNCTION) += $(LIBINETUTILS_BASE)/main.c|unikraft
 
 ################################################################################
 # Library sources
