@@ -130,22 +130,3 @@ endif
 ifeq ($(CONFIG_LIBINETUTILS_TRACEROUTE),y)
 LIBINETUTILS_SRCS-y += $(LIBINETUTILS_SRC)/src/traceroute.c
 endif
-
-################################################################################
-# Inetutils code -- ftp
-################################################################################
-ifeq ($(CONFIG_LIBINETUTILS_FTP),y)
-LIBINETUTILS_SRCS-y += $(LIBINETUTILS_SRC)/ftp/cmds.c
-LIBINETUTILS_SRCS-y += $(LIBINETUTILS_SRC)/ftp/cmdtab.c
-LIBINETUTILS_SRCS-y += $(LIBINETUTILS_SRC)/ftp/domacro.c
-LIBINETUTILS_SRCS-y += $(LIBINETUTILS_SRC)/ftp/ftp.c
-LIBINETUTILS_SRCS-y += $(LIBINETUTILS_SRC)/ftp/ruserpass.c
-LIBINETUTILS_SRCS-y += $(LIBINETUTILS_SRC)/ftp/main.c
-endif
-
-################################################################################
-# Inetutils code -- whois
-################################################################################
-ifeq ($(CONFIG_LIBINETUTILS_WHOIS),y)
-LIBINETUTILS_SRCS-y += $(LIBINETUTILS_SRC)/whois/whois.c
-endif
