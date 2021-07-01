@@ -1,7 +1,7 @@
 From 2531d0d7e0a053752a9e58831add4597ac464d87 Mon Sep 17 00:00:00 2001
 From: Ethan Cotterell <ethancotterell@gmail.com>
 Date: Wed, 9 Jun 2021 13:28:01 +0100
-Subject: [PATCH 11/13] ping: fix argp_* calls to work wordaround `weak_alias`
+Subject: [PATCH 11/15] ping: fix argp_* calls to work wordaround `weak_alias`
 
 ---
  ping/ping.c | 6 +++---

@@ -1,7 +1,7 @@
 From 2506e5c63d328573810e30f0fbab5300d2ba3094 Mon Sep 17 00:00:00 2001
 From: Ethan Cotterell <ethancotterell@gmail.com>
 Date: Mon, 7 Jun 2021 19:03:01 +0100
-Subject: [PATCH 06/13] ping: fix missing dependency on error
+Subject: [PATCH 06/15] ping: fix missing dependency on error
 
 ---
  ping/ping_address.c | 14 ++++++++------

@@ -1,7 +1,7 @@
 From bbbd55edff2cf7b56d4422d2c08a813f6560dc3d Mon Sep 17 00:00:00 2001
 From: Ethan Cotterell <ethancotterell@gmail.com>
 Date: Mon, 7 Jun 2021 19:02:29 +0100
-Subject: [PATCH 05/13] ping: fix libping ip_hdr struct
+Subject: [PATCH 05/15] ping: fix libping ip_hdr struct
 
 ---
  ping/libping.c | 8 ++++----

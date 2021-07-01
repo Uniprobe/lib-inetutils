@@ -1,7 +1,7 @@
 From 320b712a680b50bb420c17a1717b1df1d887662e Mon Sep 17 00:00:00 2001
 From: Ethan Cotterell <ethancotterell@gmail.com>
 Date: Mon, 7 Jun 2021 18:07:53 +0100
-Subject: [PATCH 02/13] libicmp: fix icmp_echo ip struct
+Subject: [PATCH 02/15] libicmp: fix icmp_echo ip struct
 
 ---
  libicmp/icmp_echo.c | 14 +++++++++-----

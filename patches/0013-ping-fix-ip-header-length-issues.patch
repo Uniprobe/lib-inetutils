@@ -1,7 +1,7 @@
 From efecc0c4713cd300af559758eefe8a04286e3daa Mon Sep 17 00:00:00 2001
 From: Ethan Cotterell <ethancotterell@gmail.com>
 Date: Thu, 10 Jun 2021 12:30:19 +0100
-Subject: [PATCH 13/13] ping: fix ip header length issues
+Subject: [PATCH 13/15] ping: fix ip header length issues
 
 ---
  ping/ping.c      |  4 ++--

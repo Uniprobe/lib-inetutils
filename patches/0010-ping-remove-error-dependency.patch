@@ -1,7 +1,7 @@
 From 821161035e194eee23f13b014278909050e9b8db Mon Sep 17 00:00:00 2001
 From: Ethan Cotterell <ethancotterell@gmail.com>
 Date: Wed, 9 Jun 2021 13:11:54 +0100
-Subject: [PATCH 10/13] ping: remove `error` dependency
+Subject: [PATCH 10/15] ping: remove `error` dependency
 
 ---
  ping/ping.c | 75 +++++++++++++++++++++++++++++++++--------------------

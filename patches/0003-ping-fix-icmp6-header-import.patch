@@ -1,7 +1,7 @@
 From 184a82dfd271bfcff6cfc14978aec6a154cc5436 Mon Sep 17 00:00:00 2001
 From: Ethan Cotterell <ethancotterell@gmail.com>
 Date: Mon, 7 Jun 2021 18:56:39 +0100
-Subject: [PATCH 03/13] ping: fix icmp6 header import
+Subject: [PATCH 03/15] ping: fix icmp6 header import
 
 ---
  ping/ping_common.h | 6 +++---

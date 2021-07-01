@@ -1,7 +1,7 @@
 From 8c2cd77a8806bd1f61857f2711f7ab457b6146ee Mon Sep 17 00:00:00 2001
 From: Ethan Cotterell <ethancotterell@gmail.com>
 Date: Thu, 10 Jun 2021 11:44:30 +0100
-Subject: [PATCH 12/13] libicmp: fix ip header length
+Subject: [PATCH 12/15] libicmp: fix ip header length
 
 ---
  libicmp/icmp_echo.c | 2 +-

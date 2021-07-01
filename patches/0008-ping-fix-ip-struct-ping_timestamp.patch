@@ -1,7 +1,7 @@
 From fdc65a9e82069e4e2c2c3ac4ce684c495eb21c4f Mon Sep 17 00:00:00 2001
 From: Ethan Cotterell <ethancotterell@gmail.com>
 Date: Mon, 7 Jun 2021 21:58:30 +0100
-Subject: [PATCH 08/13] ping: fix ip struct ping_timestamp
+Subject: [PATCH 08/15] ping: fix ip struct ping_timestamp
 
 ---
  ping/ping_timestamp.c | 14 ++++++++------
