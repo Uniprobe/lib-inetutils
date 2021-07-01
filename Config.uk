@@ -4,6 +4,16 @@ menuconfig LIBINETUTILS
 
 if LIBINETUTILS
 
+menuconfig INETUTILS_UKSTORE_SUPPORT
+	bool "Register getters with ukstore"
+	default n
+
+if INETUTILS_UKSTORE_SUPPORT
+	config INETUTILS_UKSTORE_SUPPORT_DEBUG
+		bool "Enable extra debug info for ukstore getters"
+		default n
+endif
+
 menuconfig LIBINETUTILS_LIBICMP
 	bool "Provide libicmp library"
 	default n
