@@ -6,11 +6,23 @@ if LIBINETUTILS
 
 menuconfig INETUTILS_UKSTORE_SUPPORT
 	bool "Register getters with ukstore"
+	select LIBUKSTORE
 	default n
 
 if INETUTILS_UKSTORE_SUPPORT
 	config INETUTILS_UKSTORE_SUPPORT_DEBUG
 		bool "Enable extra debug info for ukstore getters"
+		default n
+endif
+
+menuconfig INETUTILS_PROMETHEUS_SUPPORT
+	bool "Enable prometheus metric exporter"
+	default n
+	depends on INETUTILS_UKSTORE_SUPPORT
+
+if INETUTILS_PROMETHEUS_SUPPORT
+	config INETUTILS_PROMETHEUS_PING
+		bool "Enable prometheus metric export for ping"
 		default n
 endif
 
@@ -31,12 +43,17 @@ config LIBINETUTILS_TRACEROUTE
 	bool "Provide traceroute functionality"
 	default n
 
+config LIBINETUTILS_MAIN_FUNCTION
+	bool "Provide an Inetutils main function"
+	default n
+
 choice
 	prompt "Main function"
 	optional
 
 	config LIBINETUTILS_PING_MAIN_FUNCTION
 		depends on LIBINETUTILS_PING
+		select LIBINETUTILS_MAIN_FUNCTION
 		bool "Ping"
 		default n
 		help
@@ -44,6 +61,7 @@ choice
 
 	config LIBINETUTILS_TRACEROUTE_MAIN_FUNCTION
 		depends on LIBINETUTILS_TRACEROUTE
+		select LIBINETUTILS_MAIN_FUNCTION
 		bool "Traceroute"
 		default n
 		help
