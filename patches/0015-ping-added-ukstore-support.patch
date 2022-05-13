@@ -21,17 +21,17 @@ index 9ce69fc2..0d789aea 100644
  
 +#ifdef CONFIG_INETUTILS_UKSTORE_SUPPORT
 +/*** ukstore functions ***/
-+int latest_getter(__s64 *dst) {
++int latest_getter(void *n, __s64 *dst) {
 +  *dst = latest_ping_time;
 +  return 0;
 +}
 +
-+int min_getter(__s64 *dst) {
++int min_getter(void *n, __s64 *dst) {
 +  *dst = minimum_ping_time;
 +  return 0;
 +}
 +
-+int max_getter(__s64 *dst) {
++int max_getter(void *n, __s64 *dst) {
 +  *dst = maximum_ping_time;
 +  return 0;
 +}
@@ -53,9 +53,9 @@ index 87cdfca9..4792858a 100644
 +extern int64_t maximum_ping_time;
 +extern int64_t latest_ping_time;
 +
-+int latest_getter(__s64 *dst);
-+int min_getter(__s64 *dst);
-+int max_getter(__s64 *dst);
++int latest_getter(void *n, __s64 *dst);
++int min_getter(void *n, __s64 *dst);
++int max_getter(void *n, __s64 *dst);
 +
 +# include <uk/store.h>
 +UK_STORE_STATIC_ENTRY(ping_latest, s64, latest_getter, NULL);
