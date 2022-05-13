@@ -55,7 +55,6 @@ choice
 		depends on LIBINETUTILS_PING
 		select LIBINETUTILS_MAIN_FUNCTION
 		bool "Ping"
-		default n
 		help
 			Start the unikernel using the main function from `ping`
 
@@ -63,7 +62,6 @@ choice
 		depends on LIBINETUTILS_TRACEROUTE
 		select LIBINETUTILS_MAIN_FUNCTION
 		bool "Traceroute"
-		default n
 		help
 			Start the unikernel using the main function from `traceroute`
 
